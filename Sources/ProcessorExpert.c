@@ -78,7 +78,7 @@ int main(void)
         case '\r': // Send the Block usimg DMA
           if(TxCount)
           {
-            GPIO1_SetFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
+            //GPIO1_SetFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
             As1BlockSent = FALSE;
             Error = AS1_SendBlock(As1testDevData, (LDD_TData*) &As1TxBuffer, TxCount);
           }
@@ -89,7 +89,7 @@ int main(void)
           fillBuffer =0;
           while(fillBuffer < TX_MAX)
             As1TxBuffer[fillBuffer++] = fillBuffer+1;
-          GPIO1_SetFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
+          //GPIO1_SetFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
           As1BlockSent = FALSE;
           Error = AS1_SendBlock(As1testDevData, (LDD_TData*) &As1TxBuffer, TX_MAX);
           break;
@@ -103,7 +103,7 @@ int main(void)
     if(As1BlockSent)
     {
       As1BlockSent = FALSE;
-      GPIO1_ClearFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
+      // useless GPIO1_ClearFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
     }
   }
 

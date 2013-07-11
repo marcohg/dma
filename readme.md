@@ -1,5 +1,10 @@
 An example of using DMA on Tx of UART for Kinetis K20
 MH - Jul, 11,2013
+Toggling the TP2 every TX (inside's AS1 InterruptTx()
+
+// This line will be erased every time PEX generates code
+  GPIO1_ToggleFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
+  
 
 GPIOs at PTB
 	TP1 PTB18	(A22)

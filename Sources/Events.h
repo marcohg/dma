@@ -36,6 +36,8 @@
 #include "IO_Map.h"
 #include "AS1.h"
 #include "GPIO1.h"
+extern volatile bool As1OnRecByte, As1BlockSent;
+extern LDD_TDeviceData *GPIO1_Ptr;
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,7 +81,7 @@ void AS1_OnBlockSent(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
-**     Event       :  Cpu_OnNMIINT (module Events)
+**     Event       :  Cpu_OnNMIINT0 (module Events)
 **
 **     Component   :  Cpu [MK20DX256LL7]
 **     Description :
@@ -90,7 +92,7 @@ void AS1_OnBlockSent(LDD_TUserData *UserDataPtr);
 **     Returns     : Nothing
 ** ===================================================================
 */
-void Cpu_OnNMIINT(void);
+void Cpu_OnNMIINT0(void);
 
 /* END Events */
 

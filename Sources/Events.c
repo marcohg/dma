@@ -36,8 +36,7 @@ extern "C" {
 
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
-extern volatile bool As1OnRecByte, As1BlockSent;
-extern LDD_TDeviceData *GPIO1_Ptr;
+
 /*
 ** ===================================================================
 **     Event       :  AS1_OnBlockReceived (module Events)
@@ -85,7 +84,7 @@ void AS1_OnBlockSent(LDD_TUserData *UserDataPtr)
 
 /*
 ** ===================================================================
-**     Event       :  Cpu_OnNMIINT (module Events)
+**     Event       :  Cpu_OnNMIINT0 (module Events)
 **
 **     Component   :  Cpu [MK20DX256LL7]
 **     Description :
@@ -96,7 +95,7 @@ void AS1_OnBlockSent(LDD_TUserData *UserDataPtr)
 **     Returns     : Nothing
 ** ===================================================================
 */
-void Cpu_OnNMIINT(void)
+void Cpu_OnNMIINT0(void)
 {
   /* Write your code here ... */
 }
