@@ -31,6 +31,7 @@
 #include "Cpu.h"
 #include "Events.h"
 #include "AS1.h"
+#include "GPIO1.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
 #include "PE_Error.h"
@@ -41,7 +42,9 @@
 #define TX_MAX 10
 LDD_TError Error;
 byte As1RxBuffer[20], As1TxBuffer[TX_MAX];
-volatile bool As1OnRecByte = FALSE;
+volatile bool As1OnRecByte = FALSE, As1BlockSent;
+LDD_TDeviceData *GPIO1_Ptr;
+
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
 int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
@@ -58,6 +61,9 @@ int main(void)
   /* Write your code here */
   As1testDevData = AS1_Init(NULL);
   Error = AS1_ReceiveBlock(As1testDevData, (LDD_TData*) &As1RxBuffer, 1); // Receive only one byte
+  // Init GPIO
+  GPIO1_Ptr = GPIO1_Init(NULL);        // Init GPIO for testing
+    
   while(1)
   {
     // Test if Received char
@@ -71,7 +77,11 @@ int main(void)
       {
         case '\r': // Send the Block usimg DMA
           if(TxCount)
+          {
+            GPIO1_SetFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
+            As1BlockSent = FALSE;
             Error = AS1_SendBlock(As1testDevData, (LDD_TData*) &As1TxBuffer, TxCount);
+          }
           TxCount =0;
           break;
         // Fill and send the TxBuffer   
@@ -79,15 +89,22 @@ int main(void)
           fillBuffer =0;
           while(fillBuffer < TX_MAX)
             As1TxBuffer[fillBuffer++] = fillBuffer+1;
+          GPIO1_SetFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
+          As1BlockSent = FALSE;
           Error = AS1_SendBlock(As1testDevData, (LDD_TData*) &As1TxBuffer, TX_MAX);
           break;
         default:
           if(TxCount<TX_MAX)
             As1TxBuffer[TxCount++] = RecChar; // Fill the buffer
       }
-        
     }
-    
+    // Poll
+    // Measure Block transmission 
+    if(As1BlockSent)
+    {
+      As1BlockSent = FALSE;
+      GPIO1_ClearFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
+    }
   }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/

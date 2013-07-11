@@ -36,7 +36,8 @@ extern "C" {
 
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
-extern volatile bool As1OnRecByte;
+extern volatile bool As1OnRecByte, As1BlockSent;
+extern LDD_TDeviceData *GPIO1_Ptr;
 /*
 ** ===================================================================
 **     Event       :  AS1_OnBlockReceived (module Events)
@@ -57,6 +58,7 @@ void AS1_OnBlockReceived(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
   As1OnRecByte = TRUE;
+  GPIO1_ToggleFieldBits(GPIO1_Ptr, TEST_POINTS, 0x01U);
 }
 
 /*
@@ -78,11 +80,12 @@ void AS1_OnBlockReceived(LDD_TUserData *UserDataPtr)
 void AS1_OnBlockSent(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
+  As1BlockSent = TRUE;
 }
 
 /*
 ** ===================================================================
-**     Event       :  Cpu_OnNMIINT0 (module Events)
+**     Event       :  Cpu_OnNMIINT (module Events)
 **
 **     Component   :  Cpu [MK20DX256LL7]
 **     Description :
@@ -93,7 +96,7 @@ void AS1_OnBlockSent(LDD_TUserData *UserDataPtr)
 **     Returns     : Nothing
 ** ===================================================================
 */
-void Cpu_OnNMIINT0(void)
+void Cpu_OnNMIINT(void)
 {
   /* Write your code here ... */
 }
