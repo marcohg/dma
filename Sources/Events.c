@@ -82,32 +82,6 @@ void AS1_OnBlockSent(LDD_TUserData *UserDataPtr)
   As1BlockSent = TRUE;
 }
 
-/*
-** ===================================================================
-**     Event       :  DMAT_UART0_OnComplete (module Events)
-**
-**     Component   :  DMAT_UART0 [DMATransfer_LDD]
-*/
-/*!
-**     @brief
-**         Called at the end of a DMA transfer. If the Half complete
-**         property in initialization section is anabled, this event is
-**         also called when current major iteration count reaches the
-**         halfway point. See SetEventMask() and GetEventMask() methods.
-**         This event is enabled only if Interrupts property in Channel
-**         select section is enabled.
-**     @param
-**         UserDataPtr     - Pointer to the user or
-**                           RTOS specific data. This pointer is passed
-**                           as the parameter of Init method.
-*/
-/* ===================================================================*/
-void DMAT_UART0_OnComplete(LDD_TUserData *UserDataPtr)
-{
-  /* Write your code here ... */
-  UART0_C2 &= ~UART_C2_TIE_MASK;
-  GPIO1_ToggleFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
-}
 
 /*
 ** ===================================================================
@@ -128,24 +102,6 @@ void DMAT_UART0_OnComplete(LDD_TUserData *UserDataPtr)
 */
 /* ===================================================================*/
 void DMAT_UART0_OnError(LDD_TUserData *UserDataPtr)
-{
-  /* Write your code here ... */
-}
-
-/*
-** ===================================================================
-**     Event       :  Cpu_OnNMIINT (module Events)
-**
-**     Component   :  Cpu [MK20DX256LL7]
-**     Description :
-**         This event is called when the Non maskable interrupt had
-**         occurred. This event is automatically enabled when the <NMI
-**         interrupt> property is set to 'Enabled'.
-**     Parameters  : None
-**     Returns     : Nothing
-** ===================================================================
-*/
-void Cpu_OnNMIINT(void)
 {
   /* Write your code here ... */
 }
@@ -238,6 +194,91 @@ void DMAT_UART1_OnComplete(LDD_TUserData *UserDataPtr)
 */
 /* ===================================================================*/
 void DMAT_UART1_OnError(LDD_TUserData *UserDataPtr)
+{
+  /* Write your code here ... */
+}
+
+/*
+** ===================================================================
+**     Event       :  DMAT_UART0_OnComplete (module Events)
+**
+**     Component   :  DMAT_UART0 [DMATransfer_LDD]
+*/
+/*!
+**     @brief
+**         Called at the end of a DMA transfer. If the Half complete
+**         property in initialization section is anabled, this event is
+**         also called when current major iteration count reaches the
+**         halfway point. See SetEventMask() and GetEventMask() methods.
+**         This event is enabled only if Interrupts property in Channel
+**         select section is enabled.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. This pointer is passed
+**                           as the parameter of Init method.
+*/
+/* ===================================================================*/
+void DMAT_UART0_OnComplete(LDD_TUserData *UserDataPtr)
+{
+  /* Write your code here ... */
+}
+
+/*
+** ===================================================================
+**     Event       :  Cpu_OnNMIINT0 (module Events)
+**
+**     Component   :  Cpu [MK20DX256LL7]
+**     Description :
+**         This event is called when the Non maskable interrupt had
+**         occurred. This event is automatically enabled when the <NMI
+**         interrupt> property is set to 'Enabled'.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+void Cpu_OnNMIINT0(void)
+{
+  /* Write your code here ... */
+}
+
+/*
+** ===================================================================
+**     Event       :  AS3_OnBlockReceived (module Events)
+**
+**     Component   :  AS3 [Serial_LDD]
+*/
+/*!
+**     @brief
+**         This event is called when the requested number of data is
+**         moved to the input buffer.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. This pointer is passed
+**                           as the parameter of Init method.
+*/
+/* ===================================================================*/
+void AS3_OnBlockReceived(LDD_TUserData *UserDataPtr)
+{
+  /* Write your code here ... */
+}
+
+/*
+** ===================================================================
+**     Event       :  AS3_OnBlockSent (module Events)
+**
+**     Component   :  AS3 [Serial_LDD]
+*/
+/*!
+**     @brief
+**         This event is called after the last character from the
+**         output buffer is moved to the transmitter. 
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. This pointer is passed
+**                           as the parameter of Init method.
+*/
+/* ===================================================================*/
+void AS3_OnBlockSent(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
 }

@@ -35,6 +35,7 @@
 #include "DMA1.h"
 #include "DMAT_UART0.h"
 #include "DMAT_UART1.h"
+#include "AS3.h"
 #include "AS2.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
