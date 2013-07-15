@@ -1,5 +1,7 @@
 An example of using DMA on Tx of UART for Kinetis K20
 MH - Jul, 11,2013
+-Jul15
+Added second port, No DMA yet
 
 MONITOR:
 - Toggling TP1 every main loop 

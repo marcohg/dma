@@ -34,6 +34,7 @@
 #include "GPIO1.h"
 #include "DMA1.h"
 #include "DMAT_UART.h"
+#include "AS2.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
 #include "PE_Error.h"
@@ -44,7 +45,10 @@
 #define TX_MAX 200
 LDD_TError Error;
 volatile byte As1RxBuffer[20], As1TxBuffer[TX_MAX];
+volatile byte As2RxBuffer[20], As2TxBuffer[TX_MAX];
+
 volatile bool As1OnRecByte = FALSE, As1BlockSent;
+volatile bool As2OnRecByte = FALSE, As2BlockSent;
 LDD_TDeviceData *GPIO1_Ptr;
 
 /*lint -save  -e970 Disable MISRA rule (6.3) checking. */
@@ -52,7 +56,7 @@ int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
 {
   /* Write your local variable definition here */
-  LDD_TDeviceData *As1testDevData;
+  LDD_TDeviceData *As1testDevData, *As2testDevData;
   byte RecChar =0;
   volatile word TxCount =0;
   word xferSize = 16;
@@ -64,14 +68,17 @@ int main(void)
 
   /* Write your code here */
   As1testDevData = AS1_Init(NULL);
+  As2testDevData = AS2_Init(NULL);
+    
   Error = AS1_ReceiveBlock(As1testDevData, (LDD_TData*) &As1RxBuffer, 1); // Receive only one byte
+  Error = AS2_ReceiveBlock(As2testDevData, (LDD_TData*) &As2RxBuffer, 1); // Receive only one byte
   // Init GPIO
   GPIO1_Ptr = GPIO1_Init(NULL);        // Init GPIO for testing
   // Fill serial buffer with dummy data
   uint16_t m;
   for(m=0;m<TX_MAX;m++)
   {
-    As1TxBuffer[m] = (m & 0x1F) + '0'; // only ASCII visible
+    As2TxBuffer[m] = As1TxBuffer[m] = (m & 0x1F) + '0'; // only ASCII visible
   }
     
   // Allocate and enable DMA channel for UART transfers - only once
@@ -166,6 +173,15 @@ int main(void)
       UART0_C2 |= UART_C2_TIE_MASK;
             
     }
+    // Handle UART1
+    if(As2OnRecByte)
+    {
+      As2OnRecByte = FALSE;
+      RecChar = As2RxBuffer[0];
+      Error = AS2_ReceiveBlock(As2testDevData, (LDD_TData*) &As2RxBuffer, 1); // prepare to rec next byte
+      Error = AS2_SendBlock(As2testDevData, (LDD_TData*)&RecChar, 1);
+    }
+    
     //  Monitor Main loop scan 
      GPIO1_ToggleFieldBits(GPIO1_Ptr, TEST_POINTS, 0x01U);
         

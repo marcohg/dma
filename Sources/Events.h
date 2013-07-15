@@ -38,7 +38,8 @@
 #include "GPIO1.h"
 #include "DMA1.h"
 #include "DMAT_UART.h"
-extern volatile bool As1OnRecByte, As1BlockSent;
+#include "AS2.h"
+extern volatile bool As1OnRecByte, As1BlockSent, As2OnRecByte, As2BlockSent;
 extern LDD_TDeviceData *GPIO1_Ptr;
 
 #ifdef __cplusplus
@@ -137,6 +138,42 @@ void DMAT_UART_OnError(LDD_TUserData *UserDataPtr);
 ** ===================================================================
 */
 void Cpu_OnNMIINT(void);
+
+/*
+** ===================================================================
+**     Event       :  AS2_OnBlockReceived (module Events)
+**
+**     Component   :  AS2 [Serial_LDD]
+*/
+/*!
+**     @brief
+**         This event is called when the requested number of data is
+**         moved to the input buffer.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. This pointer is passed
+**                           as the parameter of Init method.
+*/
+/* ===================================================================*/
+void AS2_OnBlockReceived(LDD_TUserData *UserDataPtr);
+
+/*
+** ===================================================================
+**     Event       :  AS2_OnBlockSent (module Events)
+**
+**     Component   :  AS2 [Serial_LDD]
+*/
+/*!
+**     @brief
+**         This event is called after the last character from the
+**         output buffer is moved to the transmitter. 
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. This pointer is passed
+**                           as the parameter of Init method.
+*/
+/* ===================================================================*/
+void AS2_OnBlockSent(LDD_TUserData *UserDataPtr);
 
 /* END Events */
 
