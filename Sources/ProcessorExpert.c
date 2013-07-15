@@ -33,7 +33,8 @@
 #include "AS1.h"
 #include "GPIO1.h"
 #include "DMA1.h"
-#include "DMAT_UART.h"
+#include "DMAT_UART0.h"
+#include "DMAT_UART1.h"
 #include "AS2.h"
 /* Including shared modules, which are used for whole project */
 #include "PE_Types.h"
@@ -82,13 +83,19 @@ int main(void)
   }
     
   // Allocate and enable DMA channel for UART transfers - only once
-  Error = DMAT_UART_AllocateChannel(DMAT_UART_DeviceData);
-  Error = DMAT_UART_EnableChannel(DMAT_UART_DeviceData);
+  Error = DMAT_UART0_AllocateChannel(DMAT_UART0_DeviceData);
+  Error = DMAT_UART0_EnableChannel(DMAT_UART0_DeviceData);
   
-  // Config UART
+  // Config UART0
   UART0_C5 |= UART_C5_TDMAS_MASK;
+  // Config UART0
+  // Allocate and enable DMA channel for UART transfers - only once
+  Error = DMAT_UART1_AllocateChannel(DMAT_UART1_DeviceData);
+  Error = DMAT_UART1_EnableChannel(DMAT_UART1_DeviceData);
+  UART1_C5 |= UART_C5_TDMAS_MASK;
   trigger = FALSE;
 
+  
   // Enable the Low Power Timer
   // === LPTMR0_CSR |= LPTMR_CSR_TEN_MASK;                   // Use this line if using the Init module
   // ==== Cpu_EnableInt();
@@ -99,13 +106,22 @@ int main(void)
   while(1)
   {
           
-    // Poll if Received ONE char
-    if(As1OnRecByte)
+    // Poll if Received ONE char on any UART
+    if(As1OnRecByte || As2OnRecByte)
     {
       word fillBuffer=0;
-      As1OnRecByte = FALSE;
-      RecChar = As1RxBuffer[0];
-      Error = AS1_ReceiveBlock(As1testDevData, (LDD_TData*) &As1RxBuffer, 1); // prepare to rec next byte
+      if(As1OnRecByte)
+      {
+        RecChar = As1RxBuffer[0];
+        Error = AS1_ReceiveBlock(As1testDevData, (LDD_TData*) &As1RxBuffer, 1); // prepare to rec next byte
+      }
+              
+      else
+      {
+        RecChar = As2RxBuffer[0];
+        Error = AS2_ReceiveBlock(As2testDevData, (LDD_TData*) &As2RxBuffer, 1); // prepare to rec next byte
+      }
+      As1OnRecByte = As2OnRecByte =FALSE;
       
       
       switch(RecChar)
@@ -115,7 +131,7 @@ int main(void)
           { 
             // Send what we read 
             //GPIO1_SetFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
-            As1BlockSent = FALSE;
+            As2BlockSent = As1BlockSent = FALSE;
             xferSize = TxCount;
             trigger = TRUE;
           }
@@ -125,9 +141,9 @@ int main(void)
         case '~':
           fillBuffer =0;
           while(fillBuffer < TX_MAX)
-            As1TxBuffer[fillBuffer++] = fillBuffer+1;
+            As2TxBuffer[fillBuffer++]  = As1TxBuffer[fillBuffer] = fillBuffer+1;
           //GPIO1_SetFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
-          As1BlockSent = FALSE;
+          As2BlockSent = As1BlockSent = FALSE;
           // Error = AS1_SendBlock(As1testDevData, (LDD_TData*) &As1TxBuffer, TX_MAX);
           break;
           
@@ -150,7 +166,7 @@ int main(void)
           
         default:
           if(TxCount<TX_MAX)
-            As1TxBuffer[TxCount++] = RecChar; // Fill the buffer
+            As1TxBuffer[TxCount++] = As2TxBuffer[TxCount] = RecChar; // Fill the buffer
       }
     }
     // Poll
@@ -165,21 +181,22 @@ int main(void)
       trigger = FALSE;
       // These are the register of the DMA that need to be changed when size changes
       // Source Address -> reset to buffer start
-      Error = DMAT_UART_SetSourceAddress(DMAT_UART_DeviceData,(LDD_DMA_TAddress)(uint32_t)&As1TxBuffer); 
+      Error = DMAT_UART0_SetSourceAddress(DMAT_UART0_DeviceData,(LDD_DMA_TAddress)(uint32_t)&As1TxBuffer); 
       // We will xfer this amount of bytes (MAJOR loop)
-      Error = DMAT_UART_SetTransferCount(DMAT_UART_DeviceData, xferSize);
+      Error = DMAT_UART0_SetTransferCount(DMAT_UART0_DeviceData, xferSize);
           
       // Request a transmit TDRE (xmit register empty), which starts the DMA on ch.0
       UART0_C2 |= UART_C2_TIE_MASK;
+      
+      // Source Address -> reset to buffer start
+      Error = DMAT_UART1_SetSourceAddress(DMAT_UART1_DeviceData,(LDD_DMA_TAddress)(uint32_t)&As2TxBuffer); 
+      // We will xfer this amount of bytes (MAJOR loop)
+      Error = DMAT_UART1_SetTransferCount(DMAT_UART1_DeviceData, xferSize);
+      // Request a transmit TDRE (xmit register empty), which starts the DMA on ch.0
+      UART1_C2 |= UART_C2_TIE_MASK;
+                  
+      
             
-    }
-    // Handle UART1
-    if(As2OnRecByte)
-    {
-      As2OnRecByte = FALSE;
-      RecChar = As2RxBuffer[0];
-      Error = AS2_ReceiveBlock(As2testDevData, (LDD_TData*) &As2RxBuffer, 1); // prepare to rec next byte
-      Error = AS2_SendBlock(As2testDevData, (LDD_TData*)&RecChar, 1);
     }
     
     //  Monitor Main loop scan 

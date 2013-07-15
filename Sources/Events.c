@@ -84,9 +84,9 @@ void AS1_OnBlockSent(LDD_TUserData *UserDataPtr)
 
 /*
 ** ===================================================================
-**     Event       :  DMAT_UART_OnComplete (module Events)
+**     Event       :  DMAT_UART0_OnComplete (module Events)
 **
-**     Component   :  DMAT_UART [DMATransfer_LDD]
+**     Component   :  DMAT_UART0 [DMATransfer_LDD]
 */
 /*!
 **     @brief
@@ -102,7 +102,7 @@ void AS1_OnBlockSent(LDD_TUserData *UserDataPtr)
 **                           as the parameter of Init method.
 */
 /* ===================================================================*/
-void DMAT_UART_OnComplete(LDD_TUserData *UserDataPtr)
+void DMAT_UART0_OnComplete(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
   UART0_C2 &= ~UART_C2_TIE_MASK;
@@ -111,9 +111,9 @@ void DMAT_UART_OnComplete(LDD_TUserData *UserDataPtr)
 
 /*
 ** ===================================================================
-**     Event       :  DMAT_UART_OnError (module Events)
+**     Event       :  DMAT_UART0_OnError (module Events)
 **
-**     Component   :  DMAT_UART [DMATransfer_LDD]
+**     Component   :  DMAT_UART0 [DMATransfer_LDD]
 */
 /*!
 **     @brief
@@ -127,7 +127,7 @@ void DMAT_UART_OnComplete(LDD_TUserData *UserDataPtr)
 **                           as the parameter of Init method.
 */
 /* ===================================================================*/
-void DMAT_UART_OnError(LDD_TUserData *UserDataPtr)
+void DMAT_UART0_OnError(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
 }
@@ -189,6 +189,55 @@ void AS2_OnBlockReceived(LDD_TUserData *UserDataPtr)
 */
 /* ===================================================================*/
 void AS2_OnBlockSent(LDD_TUserData *UserDataPtr)
+{
+  /* Write your code here ... */
+}
+
+/*
+** ===================================================================
+**     Event       :  DMAT_UART1_OnComplete (module Events)
+**
+**     Component   :  DMAT_UART1 [DMATransfer_LDD]
+*/
+/*!
+**     @brief
+**         Called at the end of a DMA transfer. If the Half complete
+**         property in initialization section is anabled, this event is
+**         also called when current major iteration count reaches the
+**         halfway point. See SetEventMask() and GetEventMask() methods.
+**         This event is enabled only if Interrupts property in Channel
+**         select section is enabled.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. This pointer is passed
+**                           as the parameter of Init method.
+*/
+/* ===================================================================*/
+void DMAT_UART1_OnComplete(LDD_TUserData *UserDataPtr)
+{
+  /* Write your code here ... */
+  UART1_C2 &= ~UART_C2_TIE_MASK;
+}
+
+/*
+** ===================================================================
+**     Event       :  DMAT_UART1_OnError (module Events)
+**
+**     Component   :  DMAT_UART1 [DMATransfer_LDD]
+*/
+/*!
+**     @brief
+**         Called when error in channel settings is detected. See
+**         SetEventMask() and GetEventMask() methods. This event is
+**         enabled only if Interrupts property in Channel select
+**         section is enabled.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. This pointer is passed
+**                           as the parameter of Init method.
+*/
+/* ===================================================================*/
+void DMAT_UART1_OnError(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
 }
