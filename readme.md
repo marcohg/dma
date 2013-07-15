@@ -1,6 +1,7 @@
 An example of using DMA on Tx of UART for Kinetis K20
 MH - Jul, 11,2013
-- Jul15: Added second port, both has DMA
+- Jul 15, make cpu more compatible for merging (minor clock settings)
+- Jul15: Added second port, both has DMA. 
 
 MONITOR:
 - Toggling TP1 every main loop 
