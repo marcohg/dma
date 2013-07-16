@@ -85,29 +85,6 @@ void AS1_OnBlockSent(LDD_TUserData *UserDataPtr)
 
 /*
 ** ===================================================================
-**     Event       :  DMAT_UART0_OnError (module Events)
-**
-**     Component   :  DMAT_UART0 [DMATransfer_LDD]
-*/
-/*!
-**     @brief
-**         Called when error in channel settings is detected. See
-**         SetEventMask() and GetEventMask() methods. This event is
-**         enabled only if Interrupts property in Channel select
-**         section is enabled.
-**     @param
-**         UserDataPtr     - Pointer to the user or
-**                           RTOS specific data. This pointer is passed
-**                           as the parameter of Init method.
-*/
-/* ===================================================================*/
-void DMAT_UART0_OnError(LDD_TUserData *UserDataPtr)
-{
-  /* Write your code here ... */
-}
-
-/*
-** ===================================================================
 **     Event       :  AS2_OnBlockReceived (module Events)
 **
 **     Component   :  AS2 [Serial_LDD]
@@ -177,23 +154,43 @@ void DMAT_UART1_OnComplete(LDD_TUserData *UserDataPtr)
 
 /*
 ** ===================================================================
-**     Event       :  DMAT_UART1_OnError (module Events)
+**     Event       :  AS3_OnBlockReceived (module Events)
 **
-**     Component   :  DMAT_UART1 [DMATransfer_LDD]
+**     Component   :  AS3 [Serial_LDD]
 */
 /*!
 **     @brief
-**         Called when error in channel settings is detected. See
-**         SetEventMask() and GetEventMask() methods. This event is
-**         enabled only if Interrupts property in Channel select
-**         section is enabled.
+**         This event is called when the requested number of data is
+**         moved to the input buffer.
 **     @param
 **         UserDataPtr     - Pointer to the user or
 **                           RTOS specific data. This pointer is passed
 **                           as the parameter of Init method.
 */
 /* ===================================================================*/
-void DMAT_UART1_OnError(LDD_TUserData *UserDataPtr)
+void AS3_OnBlockReceived(LDD_TUserData *UserDataPtr)
+{
+  /* Write your code here ... */
+  As3OnRecByte = TRUE;
+}
+
+/*
+** ===================================================================
+**     Event       :  AS3_OnBlockSent (module Events)
+**
+**     Component   :  AS3 [Serial_LDD]
+*/
+/*!
+**     @brief
+**         This event is called after the last character from the
+**         output buffer is moved to the transmitter. 
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. This pointer is passed
+**                           as the parameter of Init method.
+*/
+/* ===================================================================*/
+void AS3_OnBlockSent(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
 }
@@ -221,6 +218,77 @@ void DMAT_UART1_OnError(LDD_TUserData *UserDataPtr)
 void DMAT_UART0_OnComplete(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
+  UART0_C2 &= ~UART_C2_TIE_MASK;
+}
+
+/*
+** ===================================================================
+**     Event       :  DMAT_UART0_OnError (module Events)
+**
+**     Component   :  DMAT_UART0 [DMATransfer_LDD]
+*/
+/*!
+**     @brief
+**         Called when error in channel settings is detected. See
+**         SetEventMask() and GetEventMask() methods. This event is
+**         enabled only if Interrupts property in Channel select
+**         section is enabled.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. This pointer is passed
+**                           as the parameter of Init method.
+*/
+/* ===================================================================*/
+void DMAT_UART0_OnError(LDD_TUserData *UserDataPtr)
+{
+  /* Write your code here ... */
+}
+
+/*
+** ===================================================================
+**     Event       :  DMAT_UART1_OnError (module Events)
+**
+**     Component   :  DMAT_UART1 [DMATransfer_LDD]
+*/
+/*!
+**     @brief
+**         Called when error in channel settings is detected. See
+**         SetEventMask() and GetEventMask() methods. This event is
+**         enabled only if Interrupts property in Channel select
+**         section is enabled.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. This pointer is passed
+**                           as the parameter of Init method.
+*/
+/* ===================================================================*/
+void DMAT_UART1_OnError(LDD_TUserData *UserDataPtr)
+{
+  /* Write your code here ... */
+}
+
+/*
+** ===================================================================
+**     Event       :  TINT1_OnInterrupt (module Events)
+**
+**     Component   :  TINT1 [TimerInt_LDD]
+*/
+/*!
+**     @brief
+**         Called if periodic event occur. Component and OnInterrupt
+**         event must be enabled. See <SetEventMask> and <GetEventMask>
+**         methods. This event is available only if a <Interrupt
+**         service/event> is enabled.
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. The pointer passed as
+**                           the parameter of Init method.
+*/
+/* ===================================================================*/
+void TINT1_OnInterrupt(LDD_TUserData *UserDataPtr)
+{
+  /* Write your code here ... */
+  bSystemTick = TRUE;
 }
 
 /*
@@ -237,48 +305,6 @@ void DMAT_UART0_OnComplete(LDD_TUserData *UserDataPtr)
 ** ===================================================================
 */
 void Cpu_OnNMIINT0(void)
-{
-  /* Write your code here ... */
-}
-
-/*
-** ===================================================================
-**     Event       :  AS3_OnBlockReceived (module Events)
-**
-**     Component   :  AS3 [Serial_LDD]
-*/
-/*!
-**     @brief
-**         This event is called when the requested number of data is
-**         moved to the input buffer.
-**     @param
-**         UserDataPtr     - Pointer to the user or
-**                           RTOS specific data. This pointer is passed
-**                           as the parameter of Init method.
-*/
-/* ===================================================================*/
-void AS3_OnBlockReceived(LDD_TUserData *UserDataPtr)
-{
-  /* Write your code here ... */
-}
-
-/*
-** ===================================================================
-**     Event       :  AS3_OnBlockSent (module Events)
-**
-**     Component   :  AS3 [Serial_LDD]
-*/
-/*!
-**     @brief
-**         This event is called after the last character from the
-**         output buffer is moved to the transmitter. 
-**     @param
-**         UserDataPtr     - Pointer to the user or
-**                           RTOS specific data. This pointer is passed
-**                           as the parameter of Init method.
-*/
-/* ===================================================================*/
-void AS3_OnBlockSent(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
 }

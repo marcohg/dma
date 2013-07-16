@@ -36,12 +36,15 @@
 #include "IO_Map.h"
 #include "AS1.h"
 #include "GPIO1.h"
+#include "AS3.h"
 #include "DMA1.h"
 #include "DMAT_UART0.h"
 #include "DMAT_UART1.h"
-#include "AS3.h"
+#include "TINT1.h"
+#include "TU1.h"
 #include "AS2.h"
-extern volatile bool As1OnRecByte, As1BlockSent, As2OnRecByte, As2BlockSent;
+extern volatile bool As1OnRecByte, As1BlockSent, As2OnRecByte, As2BlockSent, As3OnRecByte, As3BlockSent;
+extern volatile bool bSystemTick;
 extern LDD_TDeviceData *GPIO1_Ptr;
 
 #ifdef __cplusplus
@@ -145,38 +148,39 @@ void DMAT_UART1_OnComplete(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
-**     Event       :  DMAT_UART1_OnError (module Events)
+**     Event       :  AS3_OnBlockReceived (module Events)
 **
-**     Component   :  DMAT_UART1 [DMATransfer_LDD]
+**     Component   :  AS3 [Serial_LDD]
 */
 /*!
 **     @brief
-**         Called when error in channel settings is detected. See
-**         SetEventMask() and GetEventMask() methods. This event is
-**         enabled only if Interrupts property in Channel select
-**         section is enabled.
+**         This event is called when the requested number of data is
+**         moved to the input buffer.
 **     @param
 **         UserDataPtr     - Pointer to the user or
 **                           RTOS specific data. This pointer is passed
 **                           as the parameter of Init method.
 */
 /* ===================================================================*/
-void DMAT_UART1_OnError(LDD_TUserData *UserDataPtr);
+void AS3_OnBlockReceived(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
-**     Event       :  Cpu_OnNMIINT0 (module Events)
+**     Event       :  AS3_OnBlockSent (module Events)
 **
-**     Component   :  Cpu [MK20DX256LL7]
-**     Description :
-**         This event is called when the Non maskable interrupt had
-**         occurred. This event is automatically enabled when the <NMI
-**         interrupt> property is set to 'Enabled'.
-**     Parameters  : None
-**     Returns     : Nothing
-** ===================================================================
+**     Component   :  AS3 [Serial_LDD]
 */
-void Cpu_OnNMIINT0(void);
+/*!
+**     @brief
+**         This event is called after the last character from the
+**         output buffer is moved to the transmitter. 
+**     @param
+**         UserDataPtr     - Pointer to the user or
+**                           RTOS specific data. This pointer is passed
+**                           as the parameter of Init method.
+*/
+/* ===================================================================*/
+void AS3_OnBlockSent(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
@@ -222,39 +226,58 @@ void DMAT_UART0_OnError(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
-**     Event       :  AS3_OnBlockReceived (module Events)
+**     Event       :  DMAT_UART1_OnError (module Events)
 **
-**     Component   :  AS3 [Serial_LDD]
+**     Component   :  DMAT_UART1 [DMATransfer_LDD]
 */
 /*!
 **     @brief
-**         This event is called when the requested number of data is
-**         moved to the input buffer.
+**         Called when error in channel settings is detected. See
+**         SetEventMask() and GetEventMask() methods. This event is
+**         enabled only if Interrupts property in Channel select
+**         section is enabled.
 **     @param
 **         UserDataPtr     - Pointer to the user or
 **                           RTOS specific data. This pointer is passed
 **                           as the parameter of Init method.
 */
 /* ===================================================================*/
-void AS3_OnBlockReceived(LDD_TUserData *UserDataPtr);
+void DMAT_UART1_OnError(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
-**     Event       :  AS3_OnBlockSent (module Events)
+**     Event       :  TINT1_OnInterrupt (module Events)
 **
-**     Component   :  AS3 [Serial_LDD]
+**     Component   :  TINT1 [TimerInt_LDD]
 */
 /*!
 **     @brief
-**         This event is called after the last character from the
-**         output buffer is moved to the transmitter. 
+**         Called if periodic event occur. Component and OnInterrupt
+**         event must be enabled. See <SetEventMask> and <GetEventMask>
+**         methods. This event is available only if a <Interrupt
+**         service/event> is enabled.
 **     @param
 **         UserDataPtr     - Pointer to the user or
-**                           RTOS specific data. This pointer is passed
-**                           as the parameter of Init method.
+**                           RTOS specific data. The pointer passed as
+**                           the parameter of Init method.
 */
 /* ===================================================================*/
-void AS3_OnBlockSent(LDD_TUserData *UserDataPtr);
+void TINT1_OnInterrupt(LDD_TUserData *UserDataPtr);
+
+/*
+** ===================================================================
+**     Event       :  Cpu_OnNMIINT0 (module Events)
+**
+**     Component   :  Cpu [MK20DX256LL7]
+**     Description :
+**         This event is called when the Non maskable interrupt had
+**         occurred. This event is automatically enabled when the <NMI
+**         interrupt> property is set to 'Enabled'.
+**     Parameters  : None
+**     Returns     : Nothing
+** ===================================================================
+*/
+void Cpu_OnNMIINT0(void);
 
 /* END Events */
 

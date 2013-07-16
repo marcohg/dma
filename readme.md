@@ -1,8 +1,20 @@
 An example of using DMA on Tx of UART for Kinetis K20
 MH - Jul, 11,2013
+- Jul 16, using this PEX to generate most of the Peripherals for Profibus (deprecate Serials, Serial, Single Serial, etc)
+	UART0, UART1 -TX DMA -RX is one-by-one isr.	Fixed settings 11500,n,8,1  
+	UART2 (and UART3,UART4 on final) here is 9600,8,n,1
+	Periodic timer using PIT, 200Hz (5mZ)
+	
+	All initialization code is in cpu.c
+	
+	
+	
 - Jul 15, make cpu more compatible for merging (minor clock settings)
 - Jul15: Added second port, both has DMA. 
-
+- Spare DMA channels 0 & 1 for time trigger and use 4 & 5 for UART 0/1. 
+- Add third port to have source code to merge
+- 
+ 
 MONITOR:
 - Toggling TP1 every main loop 
 - Toggling TP2 on DMA complete (it happen actually 2 bytes before trsnmission is completed)
