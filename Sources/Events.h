@@ -46,6 +46,7 @@
 extern volatile bool As1OnRecByte, As1BlockSent, As2OnRecByte, As2BlockSent, As3OnRecByte, As3BlockSent;
 extern volatile bool bSystemTick;
 extern LDD_TDeviceData *GPIO1_Ptr;
+extern volatile word As1TxCompleteCtr;
 
 #ifdef __cplusplus
 extern "C" {
@@ -266,7 +267,7 @@ void TINT1_OnInterrupt(LDD_TUserData *UserDataPtr);
 
 /*
 ** ===================================================================
-**     Event       :  Cpu_OnNMIINT0 (module Events)
+**     Event       :  Cpu_OnNMIINT (module Events)
 **
 **     Component   :  Cpu [MK20DX256LL7]
 **     Description :
@@ -277,7 +278,7 @@ void TINT1_OnInterrupt(LDD_TUserData *UserDataPtr);
 **     Returns     : Nothing
 ** ===================================================================
 */
-void Cpu_OnNMIINT0(void);
+void Cpu_OnNMIINT(void);
 
 /* END Events */
 

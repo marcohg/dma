@@ -219,6 +219,7 @@ void DMAT_UART0_OnComplete(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
   UART0_C2 &= ~UART_C2_TIE_MASK;
+  ++As1TxCompleteCtr;
 }
 
 /*
@@ -293,7 +294,7 @@ void TINT1_OnInterrupt(LDD_TUserData *UserDataPtr)
 
 /*
 ** ===================================================================
-**     Event       :  Cpu_OnNMIINT0 (module Events)
+**     Event       :  Cpu_OnNMIINT (module Events)
 **
 **     Component   :  Cpu [MK20DX256LL7]
 **     Description :
@@ -304,7 +305,7 @@ void TINT1_OnInterrupt(LDD_TUserData *UserDataPtr)
 **     Returns     : Nothing
 ** ===================================================================
 */
-void Cpu_OnNMIINT0(void)
+void Cpu_OnNMIINT(void)
 {
   /* Write your code here ... */
 }

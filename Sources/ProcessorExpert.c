@@ -58,6 +58,7 @@ volatile byte As3RxBuffer[10], As3TxBuffer[20];
 volatile bool As1OnRecByte = FALSE, As1BlockSent;
 volatile bool As2OnRecByte = FALSE, As2BlockSent;
 volatile bool As3OnRecByte = FALSE, As3BlockSent;
+volatile word As1TxCompleteCtr;
 
 extern volatile bool bSystemTick = FALSE;
 LDD_TDeviceData *GPIO1_Ptr;
@@ -253,6 +254,11 @@ int main(void)
       GPIO1_ToggleFieldBits(GPIO1_Ptr, TEST_POINTS, 0x01U);
       ++As3Counter;
     }
+    if(As1TxCompleteCtr > 0)
+    {
+      asm( "nop");
+    }
+    
   }
 
   /*** Don't write any code pass this line, or it will be deleted during code generation. ***/
