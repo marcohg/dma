@@ -47,7 +47,7 @@
 
 /* User includes (#include below this line is not maintained by Processor Expert) */
 #define USE_DMA_FOR_TX  /*  How Tx isr are handled: DMA or isr one-by-one */
-#define TWO_DMA_UARTS       /*  define if using UART0 and UART1*/
+//#define TWO_DMA_UARTS       /*  define if using UART0 and UART1*/
 #define TX_MAX 200
 LDD_TError Error;
 volatile byte As1RxBuffer[20], As1TxBuffer[TX_MAX];
@@ -257,6 +257,7 @@ int main(void)
     if(As1TxCompleteCtr > 0)
     {
       asm( "nop");
+      --As1TxCompleteCtr;
     }
     
   }
