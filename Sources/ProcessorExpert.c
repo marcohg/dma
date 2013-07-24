@@ -58,7 +58,7 @@ volatile byte As3RxBuffer[10], As3TxBuffer[20];
 volatile bool As1OnRecByte = FALSE, As1BlockSent;
 volatile bool As2OnRecByte = FALSE, As2BlockSent;
 volatile bool As3OnRecByte = FALSE, As3BlockSent;
-volatile word As1TxCompleteCtr;
+volatile word As1TxCompleteCtr, As2TxCompleteCtr;
 
 extern volatile bool bSystemTick = FALSE;
 LDD_TDeviceData *GPIO1_Ptr;
@@ -68,7 +68,8 @@ int main(void)
 /*lint -restore Enable MISRA rule (6.3) checking. */
 {
   /* Write your local variable definition here */
-  LDD_TDeviceData *As1testDevData, *As2testDevData, *As3testDevData;
+  LDD_TDeviceData   *As1testDevData, *As2testDevData, *As3testDevData,
+                    *Dma1DevData, *DmatUart0DevData, *DmatUart1DevData;
   byte RecChar =0;
   volatile word TxCount =0;
   word xferSize = 16;
@@ -81,7 +82,12 @@ int main(void)
 
   /* Write your code here */
   // Init here most of PEX components (set to NO Auto-initialization feature) 
-
+  
+  // DMA initialization by hand, get the pointers to static objects
+  Dma1DevData = DMA1_Init(NULL);
+  DmatUart0DevData = DMAT_UART0_Init(NULL);
+  DmatUart1DevData = DMAT_UART1_Init(NULL);
+  
   (void)TINT1_Init(NULL);
   As1testDevData = AS1_Init(NULL);
   As2testDevData = AS2_Init(NULL);
@@ -101,16 +107,19 @@ int main(void)
   
 #ifdef USE_DMA_FOR_TX
   // Allocate and enable DMA channel for UART transfers - only once
-  Error = DMAT_UART0_AllocateChannel(DMAT_UART0_DeviceData);
-  Error = DMAT_UART0_EnableChannel(DMAT_UART0_DeviceData);
-  // Config UART0
-  UART0_C5 |= UART_C5_TDMAS_MASK;
-  
-#ifdef TWO_DMA_UARTS
-  // Allocate and enable DMA channel for UART transfers - only once
-  Error = DMAT_UART1_AllocateChannel(DMAT_UART1_DeviceData);
-  Error = DMAT_UART1_EnableChannel(DMAT_UART1_DeviceData);
+  // I need this --> Error = DMAT_UART1_AllocateChannel(DMAT_UART1_DeviceData); Error = DMAT_UART1_EnableChannel(DMAT_UART1_DeviceData);
+  Error = DMAT_UART1_AllocateChannel(DmatUart1DevData);
+  Error = DMAT_UART1_EnableChannel(DmatUart1DevData);
   UART1_C5 |= UART_C5_TDMAS_MASK;
+    
+  // UART0 can be DMA (TWO_DMA_UARTS) or on-at-time 
+#ifdef TWO_DMA_UARTS
+    // Allocate and enable DMA channel for UART transfers - only once
+      Error = DMAT_UART0_AllocateChannel(DMAT_UART0_DeviceData);
+      Error = DMAT_UART0_EnableChannel(DMAT_UART0_DeviceData);
+      // Config UART0
+      UART0_C5 |= UART_C5_TDMAS_MASK;
+      
 #endif
    
 #else
@@ -124,7 +133,7 @@ int main(void)
 
   // Transmit dummy data over UART
   // UART0_C2 |= UART_C2_TIE_MASK;
-    
+  As2TxCompleteCtr =1;   // Assume is ready to send a new block  
   while(1)
   {
           
@@ -199,28 +208,28 @@ int main(void)
       As1BlockSent = FALSE;
       // useless GPIO1_ClearFieldBits(GPIO1_Ptr, TEST_POINTS, 0x02U);
     }
-    if(trigger)
+    if(trigger && As2TxCompleteCtr) // Only Send new block when previous is done
     {
       trigger = FALSE;
+      As2TxCompleteCtr =0;
       
 #ifdef USE_DMA_FOR_TX
       // These are TX using DMA
-      // These are the register of the DMA that need to be changed when size changes
-      // Source Address -> reset to buffer start
-      Error = DMAT_UART0_SetSourceAddress(DMAT_UART0_DeviceData,(LDD_DMA_TAddress)(uint32_t)&As1TxBuffer); 
-      // We will xfer this amount of bytes (MAJOR loop)
-      Error = DMAT_UART0_SetTransferCount(DMAT_UART0_DeviceData, xferSize);
-          
-      // Request a transmit TDRE (xmit register empty), which starts the DMA on ch.0
-      UART0_C2 |= UART_C2_TIE_MASK;
+      // AS2 -> UART1 is always
+      Error = DMAT_UART1_SetSourceAddress(DmatUart1DevData,(LDD_DMA_TAddress)(uint32_t)&As2TxBuffer); 
+      Error = DMAT_UART1_SetTransferCount(DmatUart1DevData, xferSize);
+      // ((DMAT_UART1_TDeviceData *)DmatUart1DevData)->DescriptorPtr->
+      //
+      //  Once the initializarion is done, this is the final code PEX generates 
+      //==DeviceDataPtr->DescriptorPtr->SourceAddress = (LDD_DMA_TAddress)(uint32_t)&As2TxBuffer; /* Address of a DMA transfer source data */
+      //==DeviceDataPtr->DescriptorPtr->OuterLoopCount = (LDD_DMA_TOuterLoopCount)0x7BU; /* Number of the outer loop iteration - number of transfers. */
+      UART1_C2 |= UART_C2_TIE_MASK;
       
 #ifdef TWO_DMA_UARTS
-      // Source Address -> reset to buffer start
-      Error = DMAT_UART1_SetSourceAddress(DMAT_UART1_DeviceData,(LDD_DMA_TAddress)(uint32_t)&As2TxBuffer); 
-      // We will xfer this amount of bytes (MAJOR loop)
-      Error = DMAT_UART1_SetTransferCount(DMAT_UART1_DeviceData, xferSize);
+      // Error = DMAT_UART0_SetSourceAddress(DMAT_UART0_DeviceData,(LDD_DMA_TAddress)(uint32_t)&As1TxBuffer); -- Fixed  
+      Error = DMAT_UART0_SetTransferCount(DMAT_UART0_DeviceData, xferSize);
       // Request a transmit TDRE (xmit register empty), which starts the DMA on ch.0
-      UART1_C2 |= UART_C2_TIE_MASK;
+      UART0_C2 |= UART_C2_TIE_MASK;#endif
 #endif
       
 #else

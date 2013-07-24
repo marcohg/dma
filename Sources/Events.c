@@ -150,6 +150,7 @@ void DMAT_UART1_OnComplete(LDD_TUserData *UserDataPtr)
 {
   /* Write your code here ... */
   UART1_C2 &= ~UART_C2_TIE_MASK;
+  ++As2TxCompleteCtr;
   
 }
 

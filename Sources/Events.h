@@ -46,7 +46,7 @@
 extern volatile bool As1OnRecByte, As1BlockSent, As2OnRecByte, As2BlockSent, As3OnRecByte, As3BlockSent;
 extern volatile bool bSystemTick;
 extern LDD_TDeviceData *GPIO1_Ptr;
-extern volatile word As1TxCompleteCtr;
+extern volatile word As1TxCompleteCtr, As2TxCompleteCtr;
 
 #ifdef __cplusplus
 extern "C" {
