@@ -1,4 +1,9 @@
 An example of using DMA on Tx of UART for Kinetis K20
+- Jul 24,2013
+	- Use TXDMA in UART1 only. Debug UART0 will be different
+	- Use DMA1 'as is' It will allocate and enable the necessary channels, called from the DMA xfer descriptor
+	- Merge a single "DMAT_UART", at init will call the DMA1_init
+
 MH - Jul, 11,2013
 - Jul 16, using this PEX to generate most of the Peripherals for Profibus (deprecate Serials, Serial, Single Serial, etc)
 	UART0, UART1 -TX DMA -RX is one-by-one isr.	Fixed settings 11500,n,8,1  
